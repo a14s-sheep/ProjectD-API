@@ -2,6 +2,7 @@
 using ProjectD_API.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectD_API.Controllers
 {
@@ -17,6 +18,7 @@ namespace ProjectD_API.Controllers
         }
 
 
+        [Authorize]
         [HttpPost("get-players")]
         public async Task<IActionResult> GetCharacterList([FromBody]string userId)
         {
@@ -33,6 +35,7 @@ namespace ProjectD_API.Controllers
             return Ok(playerDTOs);
         }
 
+        [Authorize]
         [HttpPost("get")]
         public async Task<IActionResult> GetPlayer([FromBody] string playerId)
         {
@@ -43,6 +46,7 @@ namespace ProjectD_API.Controllers
             return Ok(playerData);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerData data)
         {
@@ -72,6 +76,7 @@ namespace ProjectD_API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("update")]
         public async Task<IActionResult> UpdatePlayer([FromBody] PlayerData data)
         {
@@ -99,6 +104,7 @@ namespace ProjectD_API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("delete")]
         public async Task<IActionResult> DeletePlayer([FromBody] string playerId)
         {

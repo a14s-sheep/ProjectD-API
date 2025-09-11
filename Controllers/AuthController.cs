@@ -60,7 +60,7 @@ namespace ProjectD_API.Controllers
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return BadRequest("Incorrect password");
 
-            var token = TokenHelper.GenerateJwtToken(user.Id, user.Username);
+            var token = TokenHelper.GenerateJwtToken(_configuration, user.Id, user.Username);
 
             return Ok(
                 new LoginResponse()
@@ -71,10 +71,11 @@ namespace ProjectD_API.Controllers
                 });
         }
 
+
         [HttpPost("validate-token")]
         public async Task<IActionResult> Verify([FromBody] string token)
         {
-            var userId = TokenHelper.GetUserIdFromToken(token);
+            var userId = TokenHelper.GetUserIdFromToken(_configuration, token);
             if (string.IsNullOrEmpty(userId))
                 return BadRequest(new { message = "Token is invalid or expired" });
 
