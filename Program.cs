@@ -1,6 +1,7 @@
 using System.Text;
 using FluentValidation;
 using ProjectD_API.Data;
+using ProjectD_API.Email;
 using ProjectD_API.Middlewares;
 using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
@@ -21,6 +22,9 @@ builder.Services.AddCors(options =>
         //.Build()
         );
 });
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

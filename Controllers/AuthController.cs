@@ -4,15 +4,20 @@ using ProjectD_API.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using ProjectD_API.Data.Messages;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace ProjectD_API.Controllers
 {
     [Route("api/auth")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public partial class AuthController : ControllerBase
     {
         private readonly GameDBContext _context;
         private readonly IConfiguration _configuration;
+
+        [GeneratedRegex(@"^[A-Za-z0-9._%+-]+@gmail\.com$")]
+        private static partial Regex GmailRegex();
+
 
         public AuthController(GameDBContext context, IConfiguration configuration)
         {
@@ -25,8 +30,12 @@ namespace ProjectD_API.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             // Validate request data
-            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
                 return BadRequest(new { message = "Username and Password are required" });
+
+            // TODO: Validate email with regex
+            if (!GmailRegex().IsMatch(request.Email))
+                return BadRequest(new { message = "Email is not valid" });
 
             // Check if user already exists
             if (await _context.Users.AnyAsync(u => u.Username == request.Username))
@@ -81,5 +90,7 @@ namespace ProjectD_API.Controllers
 
             return Ok(new { message = userId });
         }
+
+
     }
 }
