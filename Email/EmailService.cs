@@ -1,6 +1,6 @@
 ﻿using MailKit.Security;
+using Microsoft.Extensions.Options;
 using MimeKit;
-using System.Net.Mail;
 
 namespace ProjectD_API.Email
 {
@@ -8,9 +8,9 @@ namespace ProjectD_API.Email
     {
         private readonly EmailSettings _settings;
 
-        public EmailService(EmailSettings settings)
+        public EmailService(IOptions<EmailSettings> options)
         {
-            _settings = settings;
+            _settings = options.Value;
         }
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)

@@ -1,14 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProjectD_API.Data.Models
 {
-    public class User
+    public class User : IdentityUser
     {
         [Key]
         public required string Id { get; set; }
-        [Required, MaxLength(36)]
-        public required string Username { get; set; }
+        //[Required]
+        //public string Email { get; set; }
+        //[Required]
+        //public string UserName { get; set; }
         [Required]
         public required string PasswordHash { get; set; }
 

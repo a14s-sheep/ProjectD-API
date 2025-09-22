@@ -1,20 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProjectD_API.Data.Models;
+﻿using ProjectD_API.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ProjectD_API.Data
 {
-    public class GameDBContext : DbContext
+    public class GameDBContext : IdentityDbContext<User>
     {
         public GameDBContext(DbContextOptions<GameDBContext> options) : base(options) { }
 
         // GameServerInfo
         public DbSet<GameServerInfo> GameServerInfos { get; set; }
 
+        // GameDefaultValues
+        public DbSet<ClassDefaultStat> ClassDefaultStats { get; set; }
+        public DbSet<ClassDefaultItem> ClassDefaultItems { get; set; }
+
+        // Token
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+        // ResetPasswordPin
+        public DbSet<PasswordResetRecord> PasswordResetRecords { get; set; }
+
         // Users
         public DbSet<User> Users { get; set; }
 
         // Players
         public DbSet<Player> Players { get; set; }
+        public DbSet<CharacterClass> CharacterClasses { get; set; }
         public DbSet<PlayerItem> PlayerItems { get; set; }
         public DbSet<PlayerQuest> PlayerQuests { get; set; }
         public DbSet<PlayerTask> PlayerTasks { get; set; }
@@ -24,8 +36,12 @@ namespace ProjectD_API.Data
         {
             base.OnModelCreating(builder);
 
+            // Tokens
+            builder.Entity<RefreshToken>().Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
             // Users
-            builder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+            builder.Entity<User>(e => e.ToTable("users"));
+            builder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
             builder.Entity<User>().Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             builder.Entity<User>().Property(u => u.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
 

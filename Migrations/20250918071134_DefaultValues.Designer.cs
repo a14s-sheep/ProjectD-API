@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectD_API.Data;
 
@@ -11,9 +12,11 @@ using ProjectD_API.Data;
 namespace ProjectD_API.Migrations
 {
     [DbContext(typeof(GameDBContext))]
-    partial class GameDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250918071134_DefaultValues")]
+    partial class DefaultValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,13 +283,6 @@ namespace ProjectD_API.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Agility")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClassId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
@@ -318,9 +314,6 @@ namespace ProjectD_API.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Power")
-                        .HasColumnType("int");
-
                     b.Property<int>("StatPoint")
                         .HasColumnType("int");
 
@@ -332,9 +325,6 @@ namespace ProjectD_API.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int>("Vitality")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

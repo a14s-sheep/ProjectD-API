@@ -1,8 +1,11 @@
-﻿using ProjectD_API.Data;
-using ProjectD_API.Data.Models;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using ProjectD_API.Data;
+using ProjectD_API.Data.Messages;
+using ProjectD_API.Data.Models;
+using ProjectD_API.Helper;
 
 namespace ProjectD_API.Controllers
 {
@@ -11,16 +14,18 @@ namespace ProjectD_API.Controllers
     public partial class PlayerController : ControllerBase
     {
         private readonly GameDBContext _context;
+        private readonly IConfiguration _configuration;
 
-        public PlayerController(GameDBContext context)
+        public PlayerController(GameDBContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
 
         [Authorize]
         [HttpPost("get-players")]
-        public async Task<IActionResult> GetCharacterList([FromBody]string userId)
+        public async Task<IActionResult> GetCharacterList([FromBody] string userId)
         {
             List<PlayerData> playerDTOs = new();
             var players = await _context.Players.Where(p => p.UserId == userId).ToArrayAsync();
@@ -48,30 +53,49 @@ namespace ProjectD_API.Controllers
 
         [Authorize]
         [HttpPost("create")]
-        public async Task<IActionResult> CreatePlayer([FromBody] PlayerData data)
+        public async Task<IActionResult> CreatePlayer([FromBody] PlayerCreateRequest request)
         {
             // Validate request data
-            if (string.IsNullOrEmpty(data.UserId) || string.IsNullOrEmpty(data.Name))
+            if (string.IsNullOrEmpty(request.Username))
                 return BadRequest(new { message = "Request data is invalid" });
 
-            if (await _context.Players.AnyAsync(c => c.Name == data.Name))
-                return Conflict(new { message = "CharacterName already exists" });
+            if (await _context.Players.AnyAsync(c => c.Name == request.Username))
+                return Conflict(new { message = "Username is already exists" });
 
             // Create new player data
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+            var userId = TokenHelper.GetUserIdFromToken(_configuration, token);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                data.Id = Guid.NewGuid().ToString();
-                Player player = data.GetNewCharacter();
+                Player player = new PlayerData().GetNewCharacter();
+                player.Id = Guid.NewGuid().ToString();
+                player.UserId = userId!;
+                player.Name = request.Username;
+                player.ClassId = "Default";
+
+                player.Level = 0;
+                player.Experience = 0;
+                player.Health = 1;
+                player.CurrentMap = "Map Default";
+                player.CurrentPositionX = 0;
+                player.CurrentPositionY = 0;
+                player.CreatedAt = DateTime.UtcNow;
+                player.UpdatedAt = DateTime.UtcNow;
+
                 _context.Players.Add(player);
-                // TODO: Update logic later
-                await FillPlayerData(data);
+                //await FillPlayerData(data);
 
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
                 return Ok(new { message = "Player created successfully!" });
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 return StatusCode(500, new { message = ex.Message });
             }
         }
@@ -91,7 +115,6 @@ namespace ProjectD_API.Controllers
 
                 UpdatePlayerData(player, data);
                 _context.Players.Update(player);
-                // TODO: Update logic later
                 await FillPlayerData(data);
 
                 await _context.SaveChangesAsync();
@@ -128,6 +151,42 @@ namespace ProjectD_API.Controllers
         private async Task<PlayerData> GetPlayerDTO(Player player)
         {
             PlayerData playerDTO = player.GetPlayerData();
+
+            // Stats
+            var stats = await _context.ClassDefaultStats.Where(x => x.ClassId == player.ClassId).ToListAsync();
+            foreach (var stat in stats)
+            {
+                switch (stat.Name)
+                {
+                    case "MaxHealth":
+                        playerDTO.MaxHealth = stat.Value;
+                        break;
+                    case "HealthRegen":
+                        playerDTO.HealthRegen = stat.Value;
+                        break;
+                    case "Armor":
+                        playerDTO.Armor = stat.Value;
+                        break;
+                    case "Damage":
+                        playerDTO.Damage = stat.Value;
+                        break;
+                    case "AttackSpeed":
+                        playerDTO.AttackSpeed = stat.Value;
+                        break;
+                    case "CritPower":
+                        playerDTO.CritPower = stat.Value;
+                        break;
+                    case "CritChance":
+                        playerDTO.CritChance = stat.Value;
+                        break;
+                    case "ArmorReduction":
+                        playerDTO.ArmorReduction = stat.Value;
+                        break;
+                    case "MoveSpeed":
+                        playerDTO.MoveSpeed = stat.Value;
+                        break;
+                }
+            }
 
             // Items
             var playerItems = await _context.PlayerItems.Where(pi => pi.PlayerId == player.Id).ToListAsync();

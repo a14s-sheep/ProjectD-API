@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectD_API.Data;
 
@@ -11,9 +12,11 @@ using ProjectD_API.Data;
 namespace ProjectD_API.Migrations
 {
     [DbContext(typeof(GameDBContext))]
-    partial class GameDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250912093720_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,73 +157,6 @@ namespace ProjectD_API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ProjectD_API.Data.Models.CharacterClass", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("DefaultStatId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CharacterClasses");
-                });
-
-            modelBuilder.Entity("ProjectD_API.Data.Models.ClassDefaultItem", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClassId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("DataId")
-                        .HasColumnType("int");
-
-                    b.Property<float>("Durability")
-                        .HasColumnType("float");
-
-                    b.Property<int>("Exp")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ClassDefaultItems");
-                });
-
-            modelBuilder.Entity("ProjectD_API.Data.Models.ClassDefaultStat", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ClassId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<float>("Value")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ClassDefaultStats");
-                });
-
             modelBuilder.Entity("ProjectD_API.Data.Models.GameServerInfo", b =>
                 {
                     b.Property<int>("Id")
@@ -280,13 +216,6 @@ namespace ProjectD_API.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Agility")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClassId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
@@ -302,9 +231,6 @@ namespace ProjectD_API.Migrations
                     b.Property<float>("CurrentPositionY")
                         .HasColumnType("float");
 
-                    b.Property<int>("DataId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Experience")
                         .HasColumnType("int");
 
@@ -318,12 +244,6 @@ namespace ProjectD_API.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Power")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StatPoint")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
@@ -332,9 +252,6 @@ namespace ProjectD_API.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int>("Vitality")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
