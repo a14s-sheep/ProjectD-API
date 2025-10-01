@@ -11,8 +11,13 @@ namespace ProjectD_API.Data
 
         public int Level { get; set; }
         public int Experience { get; set; }
-        public int Health { get; set; }
+        public float Health { get; set; }
+
         public int StatPoint { get; set; }
+
+        public int Power { get; set; }
+        public int Agility { get; set; }
+        public int Vitality { get; set; }
 
         public float MaxHealth { get; set; }
         public float HealthRegen { get; set; }
@@ -34,30 +39,14 @@ namespace ProjectD_API.Data
         public List<PlayerItem> EquipItems { get; set; }
         public List<PlayerItem> InventoryItems { get; set; }
 
+        public List<PlayerSkill> Skills { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
 
     public static class PlayerExtensions
     {
-        public static Player GetNewCharacter(this PlayerData dto)
-        {
-            return new Player()
-            {
-                Id = dto.Id,
-                UserId = dto.UserId,
-                Name = dto.Name,
-                Level = dto.Level,
-                Experience = dto.Experience,
-                Health = dto.Health,
-                CurrentMap = dto.CurrentMap,
-                CurrentPositionX = dto.CurrentPositionX,
-                CurrentPositionY = dto.CurrentPositionY,
-                CreatedAt = dto.CreatedAt,
-                UpdatedAt = dto.UpdatedAt
-            };
-        }
-
         public static PlayerData GetPlayerData(this Player player)
         {
             return new PlayerData()

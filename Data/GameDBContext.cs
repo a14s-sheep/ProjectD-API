@@ -30,6 +30,7 @@ namespace ProjectD_API.Data
         public DbSet<PlayerItem> PlayerItems { get; set; }
         public DbSet<PlayerQuest> PlayerQuests { get; set; }
         public DbSet<PlayerTask> PlayerTasks { get; set; }
+        public DbSet<PlayerSkill> PlayerSkills { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

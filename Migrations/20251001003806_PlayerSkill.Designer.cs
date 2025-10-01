@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectD_API.Data;
 
@@ -11,9 +12,11 @@ using ProjectD_API.Data;
 namespace ProjectD_API.Migrations
 {
     [DbContext(typeof(GameDBContext))]
-    partial class GameDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251001003806_PlayerSkill")]
+    partial class PlayerSkill
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -283,15 +286,6 @@ namespace ProjectD_API.Migrations
                     b.Property<int>("Agility")
                         .HasColumnType("int");
 
-                    b.Property<float>("Armor")
-                        .HasColumnType("float");
-
-                    b.Property<float>("ArmorReduction")
-                        .HasColumnType("float");
-
-                    b.Property<float>("AttackSpeed")
-                        .HasColumnType("float");
-
                     b.Property<string>("ClassId")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -300,12 +294,6 @@ namespace ProjectD_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<float>("CritChance")
-                        .HasColumnType("float");
-
-                    b.Property<float>("CritPower")
-                        .HasColumnType("float");
 
                     b.Property<string>("CurrentMap")
                         .IsRequired()
@@ -317,29 +305,17 @@ namespace ProjectD_API.Migrations
                     b.Property<float>("CurrentPositionY")
                         .HasColumnType("float");
 
-                    b.Property<float>("Damage")
-                        .HasColumnType("float");
-
                     b.Property<int>("DataId")
                         .HasColumnType("int");
 
                     b.Property<int>("Experience")
                         .HasColumnType("int");
 
-                    b.Property<float>("Health")
-                        .HasColumnType("float");
-
-                    b.Property<float>("HealthRegen")
-                        .HasColumnType("float");
+                    b.Property<int>("Health")
+                        .HasColumnType("int");
 
                     b.Property<int>("Level")
                         .HasColumnType("int");
-
-                    b.Property<float>("MaxHealth")
-                        .HasColumnType("float");
-
-                    b.Property<float>("MoveSpeed")
-                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()

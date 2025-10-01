@@ -2,8 +2,9 @@ using System.Text;
 using FluentValidation;
 using ProjectD_API.Data;
 using ProjectD_API.Email;
-using ProjectD_API.Middlewares;
 using Microsoft.OpenApi.Models;
+using ProjectD_API.Middlewares;
+using ProjectD_API.Data.Profiles;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -36,7 +37,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 // AutoMapper
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(PlayerProfile));
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();

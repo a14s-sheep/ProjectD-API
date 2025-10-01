@@ -34,14 +34,15 @@ namespace ProjectD_API.Controllers
         {
             // Validate request data
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
-                return BadRequest(new { message = "Username and Password are required" });
+                return BadRequest("Username and Password are required");
+
 
             if (!GmailRegex().IsMatch(request.Email))
-                return BadRequest(new { message = "Email is not valid" });
+                return BadRequest("Email is not valid");
 
             // Check if user already exists
             if (await _context.Users.AnyAsync(u => u.UserName == request.Username))
-                return Conflict(new { message = "Username is already existed" });
+                return Conflict("Username is already existed");
 
             // Create new user
             User user = new User
@@ -62,7 +63,7 @@ namespace ProjectD_API.Controllers
         {
             // Validate request data
             if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
-                return BadRequest(new { message = "Username and Password are required" });
+                return BadRequest("Username and Password are required");
 
             // Find user
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.Username);
@@ -83,13 +84,13 @@ namespace ProjectD_API.Controllers
                 });
         }
 
-        #pragma warning disable CS1998 // Async method lacks 'await' operators
+#pragma warning disable CS1998 // Async method lacks 'await' operators
         [HttpPost("validate-token")]
         public async Task<IActionResult> Verify([FromBody] string token)
         {
             var userId = TokenHelper.GetUserIdFromToken(_configuration, token);
             if (string.IsNullOrEmpty(userId))
-                return BadRequest(new { message = "Token is invalid or expired" });
+                return BadRequest("Token is invalid or expired");
 
             return Ok(new { message = userId });
         }
@@ -100,10 +101,10 @@ namespace ProjectD_API.Controllers
 
             // Validate request data
             if (string.IsNullOrEmpty(email))
-                return BadRequest(new { message = "Email is required" });
+                return BadRequest("Email is required");
 
             if (!GmailRegex().IsMatch(email))
-                return BadRequest(new { message = "Email is not valid" });
+                return BadRequest("Email is not valid");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -111,7 +112,7 @@ namespace ProjectD_API.Controllers
             {
                 // Check if email is exist
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-                if (user == null) return BadRequest(new { message = "Email is not registered" });
+                if (user == null) return BadRequest("Email is not registered");
 
                 var random = new Random();
                 var pin = random.Next(1000, 9999);
@@ -126,12 +127,12 @@ namespace ProjectD_API.Controllers
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 });
-                return Ok(new { message = "PIN has been sent" });
+                return Ok("PIN has been sent");
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -139,9 +140,9 @@ namespace ProjectD_API.Controllers
         public async Task<IActionResult> ValidatePIN([FromBody] ValidatePINRequest request)
         {
             if (string.IsNullOrEmpty(request.Email) || (request.PIN == 0))
-                return BadRequest(new { message = "Email and PIN are required" });
+                return BadRequest("Email and PIN are required");
             if (request.PIN < 1000 || request.PIN > 10000)
-                return BadRequest(new { message = "PIN is not valid" });
+                return BadRequest("PIN is not valid");
 
             var record = await _context.PasswordResetRecords.FirstOrDefaultAsync(r => r.Email == request.Email && r.PIN == request.PIN);
             if (record == null) return BadRequest("Change password request not found!");
@@ -161,17 +162,17 @@ namespace ProjectD_API.Controllers
             /// => That's all
 
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.OldPassword) || string.IsNullOrEmpty(request.NewPassword))
-                return BadRequest(new { message = "Email, Old Password and New Password are required" });
+                return BadRequest("Email, Old Password and New Password are required");
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null) return BadRequest(new { message = "Email is not registered" });
+            if (user == null) return BadRequest("Email is not registered");
 
             if (!BCrypt.Net.BCrypt.Verify(request.OldPassword, user.PasswordHash))
-                return BadRequest(new { message = "Old Password is incorrect" });
+                return BadRequest("Old Password is incorrect");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             _context.Users.Update(user);
-            return Ok(new { message = "Password has been changed successfully!" });
+            return Ok("Password has been changed successfully!");
         }
     }
 }
