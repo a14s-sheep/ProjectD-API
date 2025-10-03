@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectD_API.Data.Messages;
 using ProjectD_API.Data.Models;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace ProjectD_API.Controllers
@@ -67,10 +68,11 @@ namespace ProjectD_API.Controllers
             try
             {
                 PlayerSkill playerSkill = new();
-                playerSkill.Id = Guid.NewGuid().ToString();
-                playerSkill.PlayerId = skill.PlayerId;
 
                 playerSkill = _mapper.Map<PlayerSkill>(skill);
+
+                playerSkill.Id = Guid.NewGuid().ToString();
+                playerSkill.PlayerId = skill.PlayerId;
 
                 _context.PlayerSkills.Add(playerSkill);
 
@@ -78,6 +80,8 @@ namespace ProjectD_API.Controllers
                 _context.Players.Update(player);
 
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
                 return Ok("Skill added");
             }
             catch (Exception ex)
@@ -96,9 +100,12 @@ namespace ProjectD_API.Controllers
             if (player == null) return NotFound("Player not found");
 
             var playerSkill = await _context.PlayerSkills.FirstOrDefaultAsync(x => x.PlayerId == skill.PlayerId && x.DataId == skill.DataId);
-            if (playerSkill == null) return NotFound("player hasn’t unlocked this skill yet");
+            if (playerSkill == null) return NotFound("Player hasn’t unlocked this skill yet");
 
-            playerSkill = _mapper.Map<PlayerSkill>(skill);
+            var id = playerSkill.Id;
+
+            playerSkill = _mapper.Map(skill, playerSkill);
+            playerSkill.Id = id;
             _context.PlayerSkills.Update(playerSkill);
             await _context.SaveChangesAsync();
 

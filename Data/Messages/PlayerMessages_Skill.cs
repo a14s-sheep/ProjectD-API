@@ -12,6 +12,11 @@
         public double LastUseTime { get; set; }
     }
 
+    public class PlayerSkillUpdate : PlayerSkillRequest
+    {
+        public string Id { get; set; }
+    }
+
     public class PlayerSkillAddPointRequest
     {
         public string PlayerId { get; set; }

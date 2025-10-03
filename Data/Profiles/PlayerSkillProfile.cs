@@ -11,6 +11,8 @@ namespace ProjectD_API.Data.Profiles
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<PlayerSkill, PlayerSkillRequest>();
+
+            CreateMap<PlayerSkillRequest, PlayerSkill>();
         }
     }
 }
