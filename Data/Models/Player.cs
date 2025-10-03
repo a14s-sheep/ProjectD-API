@@ -33,6 +33,8 @@ namespace ProjectD_API.Data.Models
         public float ArmorReduction { get; set; }
         public float MoveSpeed { get; set; }
 
+        public int SkillPoint { get; set; }
+
         public string CurrentMap { get; set; }
         public float CurrentPositionX { get; set; }
         public float CurrentPositionY { get; set; }

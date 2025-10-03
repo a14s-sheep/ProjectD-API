@@ -6,10 +6,10 @@ namespace ProjectD_API.Data.Models
     public class PlayerSkill
     {
         [Key]
-        public required string Id { get; set; }
-        public required string PlayerId { get; set; }
+        public string Id { get; set; }
+        public string PlayerId { get; set; }
 
-        public required int DataId { get; set; }
+        public int DataId { get; set; }
         public int Level { get; set; }
         public double CastTimeEnd { get; set; }
         public double ExecuteTimeEnd { get; set; }

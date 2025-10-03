@@ -1,5 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProjectD_API.Data.Messages;
 using ProjectD_API.Data.Models;
+using System.Security.Claims;
 
 namespace ProjectD_API.Controllers
 {
@@ -27,6 +31,98 @@ namespace ProjectD_API.Controllers
         {
             var skills = await _context.PlayerSkills.Where(cq => cq.PlayerId == playerId).ToArrayAsync();
             if (skills.Length != 0) _context.RemoveRange(skills);
+        }
+
+
+        [Authorize]
+        [HttpPost("skill/add-skill-point")]
+        public async Task<IActionResult> AddSkillPoint([FromBody] PlayerSkillAddPointRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.PlayerId))
+                return BadRequest("Data is not valid");
+
+            var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == request.PlayerId);
+            if (player == null) return NotFound("Player not found");
+
+            player.SkillPoint += request.Point;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Add player's skill point success");
+        }
+
+        [Authorize]
+        [HttpPost("skill/add-skill")]
+        public async Task<IActionResult> AddSkill([FromBody] PlayerSkillRequest skill)
+        {
+            /// TODO: Validate player from token (seperate)
+            var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == skill.PlayerId);
+            if (player == null) return NotFound("Player not found");
+
+            if (await _context.PlayerSkills.FirstOrDefaultAsync(x => x.PlayerId == skill.PlayerId && x.DataId == skill.DataId) != null)
+                return Conflict("Player has already unlocked this skill");
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                PlayerSkill playerSkill = new();
+                playerSkill.Id = Guid.NewGuid().ToString();
+                playerSkill.PlayerId = skill.PlayerId;
+
+                playerSkill = _mapper.Map<PlayerSkill>(skill);
+
+                _context.PlayerSkills.Add(playerSkill);
+
+                player.SkillPoint -= 1;
+                _context.Players.Update(player);
+
+                await _context.SaveChangesAsync();
+                return Ok("Skill added");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("skill/update-skill")]
+        public async Task<IActionResult> UpdateSkill([FromBody] PlayerSkillRequest skill)
+        {
+            /// TODO: Validate player from token (seperate)
+            var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == skill.PlayerId);
+            if (player == null) return NotFound("Player not found");
+
+            var playerSkill = await _context.PlayerSkills.FirstOrDefaultAsync(x => x.PlayerId == skill.PlayerId && x.DataId == skill.DataId);
+            if (playerSkill == null) return NotFound("player hasn’t unlocked this skill yet");
+
+            playerSkill = _mapper.Map<PlayerSkill>(skill);
+            _context.PlayerSkills.Update(playerSkill);
+            await _context.SaveChangesAsync();
+
+            return Ok("Skill updated");
+        }
+
+        [Authorize]
+        [HttpPost("skill/remove-skill")]
+        public async Task<IActionResult> RemoveSkill([FromBody] PlayerSkillRemoveRequest request)
+        {
+            /// TODO: Validate player from token (seperate)
+            if (request == null || string.IsNullOrEmpty(request.PlayerId))
+                return BadRequest("Data is not valid");
+
+            var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == request.PlayerId);
+            if (player == null) return NotFound("Player not found");
+
+            var playerSkill = await _context.PlayerSkills.FirstOrDefaultAsync(x => x.PlayerId == request.PlayerId && x.DataId == request.DataId);
+            if (playerSkill == null) return NotFound("player hasn’t unlocked this skill yet");
+
+            _context.PlayerSkills.Remove(playerSkill);
+            await _context.SaveChangesAsync();
+
+            return Ok("Skill removed");
         }
     }
 }

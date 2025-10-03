@@ -73,8 +73,6 @@ namespace ProjectD_API.Controllers
 
             try
             {
-
-
                 var player = new Player();
 
                 player.Id = Guid.NewGuid().ToString();
