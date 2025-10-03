@@ -45,7 +45,6 @@ namespace ProjectD_API.Controllers
             var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == request.PlayerId);
             if (player == null) return NotFound("Player not found");
 
-            if (player.SkillPoint == 0) return BadRequest("Player has no skill point");
             player.SkillPoint += request.Point;
 
             await _context.SaveChangesAsync();
@@ -76,6 +75,8 @@ namespace ProjectD_API.Controllers
                 playerSkill.PlayerId = skill.PlayerId;
 
                 _context.PlayerSkills.Add(playerSkill);
+
+                if (player.SkillPoint == 0) return BadRequest("Player has no skill point");
 
                 player.SkillPoint -= 1;
                 _context.Players.Update(player);
