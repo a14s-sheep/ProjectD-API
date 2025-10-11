@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ProjectD_API.Data;
-using ProjectD_API.Data.Messages;
-using ProjectD_API.Data.Models;
 using ProjectD_API.Helper;
+using Microsoft.AspNetCore.Mvc;
+using ProjectD_API.Data.Models;
+using ProjectD_API.Data.Messages;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectD_API.Controllers
 {
@@ -175,20 +175,38 @@ namespace ProjectD_API.Controllers
         [HttpPost("delete")]
         public async Task<IActionResult> DeletePlayer([FromBody] string playerId)
         {
+
+            var character = await _context.Players.FindAsync(playerId);
+            if (character == null) return NotFound("Character not found");
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                var character = await _context.Players.FindAsync(playerId);
-                if (character == null) return NotFound("Character not found");
+                var playerItems = _context.PlayerItems.Where(x => x.PlayerId == playerId);
+                if (playerItems.Count() > 0) _context.PlayerItems.RemoveRange(playerItems);
 
-                // TODO: Consider soft delete or not
+                var playerQuests = _context.PlayerQuests.Where(x => x.PlayerId == playerId);
+                if (playerQuests.Count() > 0) _context.PlayerQuests.RemoveRange(playerQuests);
+
+                var playerTasks = _context.PlayerTasks.Where(x => x.PlayerId == playerId);
+                if (playerTasks.Count() > 0) _context.PlayerTasks.RemoveRange(playerTasks);
+
+                var playerSkills = _context.PlayerSkills.Where(x => x.PlayerId == playerId);
+                if (playerSkills.Count() > 0) _context.PlayerSkills.RemoveRange(playerSkills);
+
+                _context.Players.Remove(character);
 
                 await _context.SaveChangesAsync();
-                return Ok("Character not found");
+                await transaction.CommitAsync();
+                return Ok("Character Deleted");
+
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 return StatusCode(500, ex.Message);
-            }
+            } 
         }
 
 

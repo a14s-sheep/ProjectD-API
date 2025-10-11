@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectD_API.Data.Messages;
 using ProjectD_API.Data.Models;
-using System.Diagnostics;
-using System.Security.Claims;
 
 namespace ProjectD_API.Controllers
 {
