@@ -34,6 +34,16 @@ namespace ProjectD_API.Controllers
             if (skills.Length != 0) _context.RemoveRange(skills);
         }
 
+        [Authorize]
+        [HttpPost("skill/get-player-skills")]
+        public async Task<IActionResult> GetPlayerSkills([FromBody] string playerId)
+        {
+            List<PlayerSkill> playerSkills = await _context.PlayerSkills.Where(p => p.PlayerId == playerId).ToListAsync();
+            if(playerSkills == null || playerSkills.Count == 0) return Ok("Player's skills not found!");
+
+
+            return Ok(playerSkills);
+        }
 
         [Authorize]
         [HttpPost("skill/add-skill-point")]
@@ -76,15 +86,15 @@ namespace ProjectD_API.Controllers
 
                 _context.PlayerSkills.Add(playerSkill);
 
-                if (player.SkillPoint == 0) return BadRequest("Player has no skill point");
+                //if (player.SkillPoint == 0) return BadRequest("Player has no skill point");
 
-                player.SkillPoint -= 1;
+                //player.SkillPoint -= 1;
                 _context.Players.Update(player);
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return Ok("Skill added");
+                return Ok(playerSkill);
             }
             catch (Exception ex)
             {

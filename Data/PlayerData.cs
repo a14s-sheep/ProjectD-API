@@ -14,6 +14,7 @@ namespace ProjectD_API.Data
         public float Health { get; set; }
 
         public int StatPoint { get; set; }
+        public int SkillPoint { get; set; }
 
         public int Power { get; set; }
         public int Agility { get; set; }
