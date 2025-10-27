@@ -15,7 +15,7 @@ namespace ProjectD_API.Data.Models
         public int Exp { get; set; }
         public byte Rarity { get; set; }
         public float Durability { get; set; }
-        public int InventoryIndex { get; set; }
+        public int SlotIndex { get; set; }
         public byte InventoryType { get; set; } // 0 = Equip, 1 = Inventory, 2 = Storage
 
         [Required]

@@ -84,6 +84,18 @@ namespace ProjectD_API.Controllers
                 player.Level = 1;
                 player.Experience = 0;
 
+                // Items
+                var items = await _context.ClassDefaultItems.Where(x => x.ClassId == player.ClassId).ToListAsync();
+                foreach (var item in items)
+                {
+                    PlayerItem playerItem = _mapper.Map<PlayerItem>(item);
+                    playerItem.Id = Guid.NewGuid().ToString();
+                    playerItem.PlayerId = player.Id;
+                    _context.PlayerItems.Add(playerItem);
+                }
+
+
+                // Stats
                 var stats = await _context.ClassDefaultStats.Where(x => x.ClassId == player.ClassId).ToListAsync();
                 foreach (var stat in stats)
                 {
@@ -200,7 +212,6 @@ namespace ProjectD_API.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return Ok("Character Deleted");
-
             }
             catch (Exception ex)
             {

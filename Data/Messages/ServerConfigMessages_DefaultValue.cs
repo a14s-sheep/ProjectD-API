@@ -14,5 +14,12 @@
             public float ArmorReduction { get; set; }
             public float Armor { get; set; }
         }
+
+
+        public class DefaultItemsAddRequest()
+        {
+            public string ClassId { get; set; }
+            public List<PlayerItemRequest> Items { get; set; }
+        }
     }
 }

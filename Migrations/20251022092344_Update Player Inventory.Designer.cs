@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectD_API.Data;
 
@@ -11,9 +12,11 @@ using ProjectD_API.Data;
 namespace ProjectD_API.Migrations
 {
     [DbContext(typeof(GameDBContext))]
-    partial class GameDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251022092344_Update Player Inventory")]
+    partial class UpdatePlayerInventory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,16 +195,7 @@ namespace ProjectD_API.Migrations
                     b.Property<int>("Exp")
                         .HasColumnType("int");
 
-                    b.Property<int>("InventoryType")
-                        .HasColumnType("int");
-
                     b.Property<int>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Rarity")
-                        .HasColumnType("tinyint unsigned");
-
-                    b.Property<int>("SlotIndex")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
